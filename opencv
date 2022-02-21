@@ -1,0 +1,63 @@
+!pip install opencv-python
+!pip install opencv-contrib-python
+!pip install matplotlib
+!pip install scikit-image
+!pip install imutils
+!pip install dlib==19.8.1
+#( or dlib-19.8.1-cp36-cp36m-win_amd64.whl ) xpython 3.6.x)
+!pip install pytesseract
+!pip install numpy
+
+### import numpy as np
+import numpy as np
+import cv2
+
+
+cap = cv2.VideoCapture("./video/Pocari.mp4")              
+size_h=cap.get(cv2.CAP_PROP_FRAME_WIDTH )
+size_w=cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+fps = cap.get(cv2.CAP_PROP_FPS)
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+out = cv2.VideoWriter(r'C:\Users\Tibame_T14\Desktop\AI上課資料\opencv\OpenCV-20220214T053318Z-001\OpenCV\video\output.mp4', fourcc, fps,(int(size_h),int(size_w)))
+
+F_Count = cap.get(cv2.CAP_PROP_FRAME_COUNT)   
+print(f'fps : {fps:.2f} ms, Frame_Count : {F_Count}')
+
+       
+count = 0 
+while(cap.isOpened()):
+    ret, frame = cap.read()
+    if not ret:          # key escape
+        break
+    count += 1
+
+    # if ret == True:
+        
+    if 100 <= count < 200:
+        # frame = cv2.Canny(frame, 100, 200)
+        frame = cv2.putText(frame,'canny', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv2.LINE_AA)
+        frame = cv2.Canny(frame, 100, 200)
+
+    elif 200 <= count <F_Count:
+        frame = cv2.Laplacian(frame, cv2.CV_64F)
+        frame = cv2.convertScaleAbs(frame)
+        frame = cv2.putText(frame,'Laplacian', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2, cv2.LINE_AA)
+
+    else: 
+        frame = cv2.flip(frame,0)
+        frame = cv2.putText(frame,'flip', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2, cv2.LINE_AA)
+            
+    c=cv2.waitKey(30)            # 25 ms per frame     1/FPS
+    if  c==27:          # key escape
+        break
+    out.write(frame)
+
+    cv2.imshow('frame',frame)
+    
+
+    
+## Release everything if job is finished
+cap.release()
+out.release()
+cv2.destroyAllWindows()
+cv2.waitKey(1)
